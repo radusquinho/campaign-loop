@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es" data-runtime="browser">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Automatización de marketing, análisis de campañas y experimentos A/B.">
+  <title>Campaign Loop</title>
+  <link rel="stylesheet" href="./app.css">
+  <script type="module" src="./app.mjs"></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#resumen"><span class="brand-mark" aria-hidden="true">∞</span>Campaign Loop</a>
+    <div class="workspace"><span class="workspace-avatar">V</span><span><strong>Vértice Studio</strong><small>Espacio de trabajo</small></span></div>
+    <nav aria-label="Principal">
+      <a href="#resumen" data-view="resumen"><span aria-hidden="true">◉</span>Resumen</a>
+      <a href="#campanas" data-view="campanas"><span aria-hidden="true">▤</span>Campañas</a>
+      <a href="#automatizacion" data-view="automatizacion"><span aria-hidden="true">ϟ</span>Automatización <b id="queue-count" hidden></b></a>
+      <a href="#experimentos" data-view="experimentos"><span aria-hidden="true">◫</span>Experimentos</a>
+      <a href="#actividad" data-view="actividad"><span aria-hidden="true">◷</span>Actividad</a>
+    </nav>
+    <div class="side-bottom">
+      <span class="side-dot" aria-hidden="true"></span><span><strong>Modo simulación</strong><small>Sin envío ni gasto publicitario</small></span>
+    </div>
+  </aside>
+  <main>
+    <header class="topbar"><span id="breadcrumb">Vista general</span><div class="top-actions">
+      <button type="button" class="quiet" id="data-button"><span aria-hidden="true">⇧</span> Datos</button>
+      <button type="button" class="source" id="scope-button" aria-label="Cambiar conjunto de datos"><span></span><strong id="scope-name">Datos de ejemplo</strong><i aria-hidden="true"></i></button>
+    </div></header>
+    <div class="content" id="content" aria-busy="true">
+      <div class="page-head">
+        <div><h1 id="page-title">Rendimiento de campañas</h1><p id="page-description">Mide tus campañas y convierte las señales en experimentos.</p></div>
+        <button type="button" class="button primary" id="scan-button"><span aria-hidden="true">ϟ</span> Ejecutar análisis</button>
+      </div>
+      <div class="filters" id="filters" aria-label="Filtros del panel">
+          <span id="range" class="date-range"></span>
+          <div>
+            <div class="select-wrap"><select id="days" aria-label="Periodo"><option value="7">Últimos 7 días</option><option value="14" selected>Últimos 14 días</option><option value="28">Últimos 28 días</option></select></div>
+            <div class="select-wrap"><select id="channel" aria-label="Canal"><option value="">Todos los canales</option><option>Meta Ads</option><option>Google Ads</option><option>Email</option></select></div>
+          </div>
+      </div>
+      <section id="view-resumen" class="view">
+        <div class="metrics" id="metrics"></div>
+        <div class="overview-grid">
+          <article class="panel chart-panel">
+            <div class="panel-head"><div><h2>Tendencia de rendimiento</h2><p>Totales diarios del periodo seleccionado</p></div>
+              <div class="select-wrap small"><select id="chart-metric" aria-label="Métrica del gráfico"><option value="revenue">Ingresos y gasto</option><option value="conversions">Conversiones</option><option value="ctr">CTR</option></select></div>
+            </div>
+            <div id="chart-legend" class="chart-legend"></div>
+            <div class="chart-wrap"><canvas id="chart" aria-label="Gráfico de rendimiento por fecha" role="img"></canvas><span id="chart-tip" class="chart-tip" hidden></span></div>
+            <div id="chart-description" class="sr-only"></div>
+          </article>
+          <article class="panel queue-panel">
+            <div class="panel-head"><div><h2>Cola de optimización</h2><p>Propuestas pendientes de aprobación</p></div><span id="summary-count" class="count">0</span></div>
+            <div id="queue-preview"></div>
+            <a class="panel-link" href="#automatizacion">Ver automatización <span aria-hidden="true">›</span></a>
+          </article>
+        </div>
+        <article class="panel campaign-panel">
+          <div class="panel-head"><div><h2>Campañas activas</h2><p>Ordenadas por ingresos en el periodo</p></div><a class="text-link" href="#campanas">Ver campañas</a></div>
+          <div id="campaign-preview" class="table-wrap"></div>
+        </article>
+      </section>
+      <section id="view-campanas" class="view" hidden>
+        <article class="panel campaign-panel">
+          <div class="panel-head"><div><h2>Campañas del periodo</h2><p id="campaign-caption"></p></div><a class="button secondary" id="export-link" href="/api/export">Exportar CSV</a></div>
+          <div id="campaign-table" class="table-wrap"></div>
+        </article>
+      </section>
+      <section id="view-automatizacion" class="view" hidden>
+        <article class="panel schedule">
+          <div><h2>Análisis programado</h2><p id="schedule-note"></p></div>
+          <button type="button" class="button secondary" id="schedule-button">Activar cada 15 min</button>
+        </article>
+        <div class="sub-head"><h2>Propuestas</h2><p id="model-note"></p></div>
+        <div id="proposals" class="detail-list"></div>
+      </section>
+      <section id="view-experimentos" class="view" hidden><div id="experiments" class="detail-list"></div></section>
+      <section id="view-actividad" class="view" hidden>
+        <article class="panel"><div class="panel-head"><div><h2>Historial de actividad</h2><p>Importaciones, análisis, aprobaciones y simulaciones</p></div></div>
+        <div id="activity" class="activity"></div></article>
+      </section>
+    </div>
+  </main>
+  <dialog id="data-dialog" aria-labelledby="data-title">
+    <div class="dialog-head"><h2 id="data-title">Conjuntos de datos</h2><form method="dialog"><button class="icon-button" aria-label="Cerrar">×</button></form></div>
+    <p>Cambia entre la demo de Vértice Studio y tus propias campañas importadas.</p>
+    <div class="dataset-options">
+      <button class="dataset-option" type="button" data-scope="demo"><strong>Datos de ejemplo</strong><small>Campañas ficticias con señales y métricas</small></button>
+      <button class="dataset-option" type="button" data-scope="workspace"><strong>Mis datos</strong><small>Campañas agregadas importadas por CSV</small></button>
+    </div>
+    <form id="import-form">
+      <label for="csv">Importar CSV a Mis datos</label>
+      <input id="csv" type="file" accept=".csv,text/csv" required>
+      <p>Las filas con el mismo canal, campaña y fecha se actualizan.</p>
+      <div class="dialog-actions"><a href="/api/sample" class="button secondary" id="sample-link">Descargar plantilla</a><button type="submit" class="button primary">Importar CSV</button></div>
+      <p class="form-error" id="form-error" role="alert"></p>
+    </form>
+  </dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>
